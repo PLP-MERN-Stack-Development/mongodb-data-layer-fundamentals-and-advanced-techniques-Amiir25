@@ -43,4 +43,58 @@ const projection = "db.books.find( {}, { title: 1, author: 1, price: 1, _id: 0 }
 // Sorting by price (both ascending and descending)
 const sortASC = 'db.books.find().sort({ price: 1 })' // Ascending
 const sortDSC = 'db.books.find().sort({ price: -1 })' // Descending
+// limit() and skip() methods to implement pagination
+const pagenation = 'db.books.find().skip(5).limit(5)'
 
+// Task - 4
+
+// Aggregation pipeline to calculate the average price of books by genre
+const average = "
+  db.books.aggregate([
+  {
+    $group: {
+      _id: '$genre',
+      avgPrice: { $avg: '$price' }
+      }
+    }
+  ])
+"
+// Aggregation pipeline to find the author with the most books in the collection
+const mostBooks = "
+  db.books.aggregate([
+  {
+    $group: {
+      _id: '$author',
+      bookCount: { $sum: 1 }
+    }
+  },
+  { $sort: { bookCount: -1 } },
+  { $limit: 1 }
+  ])
+"
+// Pipeline that groups books by publication decade and counts them
+const Count = "
+db.books.aggregate([
+  {
+    $project: {
+      decade: { $multiply: [ { $floor: { $divide: [ '$release_year', 10 ] } }, 10 ] }
+    }
+  },
+  {
+    $group: {
+      _id: '$decade',
+      count: { $sum: 1 }
+    }
+  },
+  { $sort: { _id: 1 } }
+])
+"
+
+// Task - 5
+
+// Index on the title field
+const index = 'db.books.createIndex({ title: 1 })'
+// Compound index on author and published_year
+const compoundIndex = 'db.books.createIndex({ author: 1, published_year: -1 })'
+// xplain() method to demonstrate the performance improvement with your indexes
+const explain = 'db.books.find({ title: "Inception" }).explain("executionStats")'
